@@ -8,6 +8,7 @@ mv /.snapshots /.snapshots-backup
 # Установка пакетов, запуск сервисов
 xbps-install -S snapper dcron grub-btrfs --yes
 ln -sf /etc/sv/dcron /var/service/
+ln -sf /etc/sv/dbus /var/service/
 
 snapper -c root create-config /
 rmdir /.snapshots
