@@ -15,9 +15,8 @@ mount -o subvol=/ "$ROOT_PARTITION" /mnt
 # Копирование системных файлов void в @ subvolume.
 btrfs subvolume snapshot /mnt /mnt/@
 
-# Создание пустого subvolume @home и .snapshots соотв.
+# Создание пустого subvolume @home
 btrfs subvolume create /mnt/@home
-btrfs subvolume create /mnt/.snapshots
 
 echo "[2] copying home files"
 # Копирование файлов из home в соотв. subvolume.
@@ -55,7 +54,6 @@ echo "[7] configuring fstab"
 cat << EOF > /mnt/etc/fstab
 UUID=$UUID_BTRFS    /            btrfs    rw,noatime,compress=zstd:1,ssd,subvol=@        0 0
 UUID=$UUID_BTRFS    /home        btrfs    rw,noatime,compress=zstd:1,ssd,subvol=@home    0 0
-UUID=$UUID_BTRFS    /.snapshots  btrfs    rw,noatime,compress=zstd:1,ssd,subvol=.snapshots 0 0
 UUID=$UUID_EFI      /boot/efi    vfat     rw,noatime,fmask=0077,dmask=0077               0 2
 EOF
 
@@ -72,7 +70,7 @@ mount --mkdir --bind "$EFIVARS_DIR" "/mnt$EFIVARS_DIR"
 echo "[9] chroot configurations"
 # Выполняем команды внутри chroot
 chroot /mnt /bin/bash << 'CHROOT_EOF'
-mkdir -p /.snapshots
+
 # Настройка GRUB для BTRFS
 echo "GRUB_BTRFS_SUBVOLROOT=@" >> /etc/default/grub
 echo "GRUB_DISABLE_OS_PROBER=false" >> /etc/default/grub 
