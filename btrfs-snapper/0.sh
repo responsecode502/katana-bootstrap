@@ -84,5 +84,7 @@ grub-install \
 # Cоздаем актуальное меню загрузки GRUB с новыми путями к ядру
 grub-mkconfig -o /boot/grub/grub.cfg
 
+update-grub
+
 exit
 CHROOT_EOF
