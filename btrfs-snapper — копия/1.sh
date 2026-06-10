@@ -17,7 +17,7 @@ btrfs subvolume snapshot /mnt /mnt/@
 
 # Создание пустого subvolume @home и .snapshots соотв.
 btrfs subvolume create /mnt/@home
-btrfs subvolume create /mnt/@/.snapshots
+btrfs subvolume create /mnt/.snapshots
 
 echo "[2] copying home files"
 # Копирование файлов из home в соотв. subvolume.
@@ -25,7 +25,8 @@ cp -a /mnt/home/. /mnt/@home/
 
 echo "[3] cleaning unused /mnt core files"
 # Удаляем "болтающиеся" системные файлы.
-find /mnt -maxdepth 1 ! -name '/mnt' ! -name '@' ! -name '@home' -exec rm -rf {} +
+cd /mnt
+rm -rf bin boot dev etc home lib lib64 media mnt opt proc root sbin srv sys tmp usr var
 
 echo "[4] unmounting /mnt"
 # Переходим в корень live системы, размонт. ssd.
@@ -54,7 +55,7 @@ echo "[7] configuring fstab"
 cat << EOF > /mnt/etc/fstab
 UUID=$UUID_BTRFS    /            btrfs    rw,noatime,compress=zstd:1,ssd,subvol=@        0 0
 UUID=$UUID_BTRFS    /home        btrfs    rw,noatime,compress=zstd:1,ssd,subvol=@home    0 0
-UUID=$UUID_BTRFS    /.snapshots  btrfs    rw,noatime,compress=zstd:1,ssd,subvol=@/.snapshots 0 0
+UUID=$UUID_BTRFS    /.snapshots  btrfs    rw,noatime,compress=zstd:1,ssd,subvol=.snapshots 0 0
 UUID=$UUID_EFI      /boot/efi    vfat     rw,noatime,fmask=0077,dmask=0077               0 2
 EOF
 
@@ -71,6 +72,7 @@ mount --mkdir --bind "$EFIVARS_DIR" "/mnt$EFIVARS_DIR"
 echo "[9] chroot configurations"
 # Выполняем команды внутри chroot
 chroot /mnt /bin/bash << 'CHROOT_EOF'
+mkdir -p /.snapshots
 # Настройка GRUB для BTRFS
 echo "GRUB_BTRFS_SUBVOLROOT=@" >> /etc/default/grub
 echo "GRUB_DISABLE_OS_PROBER=false" >> /etc/default/grub 
