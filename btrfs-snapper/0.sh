@@ -46,6 +46,11 @@ mkdir -p /mnt/home /mnt/boot/efi
 mount -o subvol=@home,noatime,compress=zstd:1,ssd "$ROOT_PARTITION" /mnt/home
 mount "$BOOT_EFI_PARTITION" /mnt/boot/efi
 
+SNAPPER_DIR="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
+BOOTSTRAP_DIR="$(dirname "$SNAPPER_DIR")"
+mkdir -p /mnt/katana-bootstrap
+cp -a "$BOOTSTRAP_DIR/." /mnt/katana-bootstrap/
+
 #echo "[7] updating xbps"
 #xbps-install -Su --yes
 
