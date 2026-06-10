@@ -39,13 +39,14 @@ echo "UUID for EFI: $UUID_EFI"
 echo "[6] mounting subvolumes, creating needed dirs"
 # Теперь /mnt ссылается на @ subvolume.
 mount -o subvol=@,noatime,compress=zstd:1,ssd "$ROOT_PARTITION" /mnt
-mount --mkdir -o subvol=@home,noatime,compress=zstd:1,ssd "$ROOT_PARTITION" /mnt/home
-mount --mkdir "$BOOT_EFI_PARTITION" /mnt/boot/efi
+mkdir -p /mnt/home /mnt/.snapshots /mnt/boot/efi
+mount -o subvol=@home,noatime,compress=zstd:1,ssd "$ROOT_PARTITION" /mnt/home
+mount "$BOOT_EFI_PARTITION" /mnt/boot/efi
 
-echo "[7] updating xbps"
-xbps-install -Su --yes
+#echo "[7] updating xbps"
+#xbps-install -Su --yes
 
-echo "[8] configuring fstab"
+echo "[7] configuring fstab"
 # Накатываем линковку под subvolumes.
 cat << EOF > /mnt/etc/fstab
 UUID=$UUID_BTRFS    /            btrfs    rw,noatime,compress=zstd:1,ssd,subvol=@        0 0
