@@ -39,7 +39,7 @@ echo "UUID for EFI: $UUID_EFI"
 echo "[6] mounting subvolumes, creating needed dirs"
 # Теперь /mnt ссылается на @ subvolume.
 mount -o subvol=@,noatime,compress=zstd:1,ssd "$ROOT_PARTITION" /mnt
-mkdir -p /mnt/home /mnt/.snapshots /mnt/boot/efi
+mkdir -p /mnt/home /mnt/boot/efi
 mount -o subvol=@home,noatime,compress=zstd:1,ssd "$ROOT_PARTITION" /mnt/home
 mount "$BOOT_EFI_PARTITION" /mnt/boot/efi
 
@@ -68,6 +68,7 @@ mount --mkdir --bind "$EFIVARS_DIR" "/mnt$EFIVARS_DIR"
 echo "[9] chroot configurations"
 # Выполняем команды внутри chroot
 chroot /mnt /bin/bash << 'CHROOT_EOF'
+mkdir -p /.snapshots
 # Настройка GRUB для BTRFS
 echo "GRUB_BTRFS_SUBVOLROOT=@" >> /etc/default/grub
 echo "GRUB_DISABLE_OS_PROBER=false" >> /etc/default/grub 
